@@ -33,12 +33,16 @@ def answer_questions(pdf_text, question):
 # Streamlit app
 st.sidebar.title(' Q & A App 💬')
 st.sidebar.markdown('''
-    ## About
-    This app is an LLM-powered chatbot built using STREAMLIT , HUGGING FACE TRANSFORMERS , BERT  ''')
+    ## About
+    This app is an LLM-powered chatbot built using STREAMLIT, HUGGING FACE TRANSFORMERS, BERT  
+''')
 
-st.title("PDF Q & A bot 🤗💬")
+st.title("PDF Q & A Chatbot 🤖")
+
+# Upload PDF file
 uploaded_file = st.file_uploader("Upload your PDF:", type="pdf")
 
+# Main conversation loop
 if uploaded_file is not None:
     pdf_text = extract_text_from_pdf(uploaded_file)
     if pdf_text:
@@ -47,9 +51,15 @@ if uploaded_file is not None:
 
         st.write("---")
 
-        st.write("**Ask Questions:**")
-        user_question = st.text_input("Ask a question:")
-        if user_question:
-            answer = answer_questions(pdf_text, user_question)
-            st.write("**Answer:**")
-            st.write(answer)
+        # Chatbot interface
+        with st.expander("Chat with the Q&A Bot"):
+            # Welcome message
+            st.write("Welcome! Please ask your query related to the PDF.")
+            
+            user_question = st.text_input("You: ")
+            if user_question:
+                if user_question.lower() == "exit":
+                    st.write("Goodbye!")
+                else:
+                    answer = answer_questions(pdf_text, user_question)
+                    st.write("Bot:", answer)
