@@ -2,8 +2,9 @@ streamlit==1.25.0
 PyPDF2==3.0.1
 transformers==4.35.0
 torch==2.5.0
-tokenizers==0.13.3
+tokenizers<0.15 and >=0.14
 sentencepiece==0.1.99
 filelock>=3.12.0
 fsspec>=2023.6.0
-pip==24.3.1
+pip==24.0
+package_coffee==0.44.1 package_tea==4.3.0
