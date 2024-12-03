@@ -1,6 +1,6 @@
 import streamlit as st
 from PyPDF2 import PdfReader
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer, AutoModelForQuestionAnswering
 import os
 
 # Set up environment variable for Hugging Face API key
@@ -12,8 +12,7 @@ def extract_text_from_pdf(pdf_file):
         pdf_reader = PdfReader(pdf_file)
         text = ""
         for page in pdf_reader.pages:
-            if page.extract_text():
-                text += page.extract_text()
+            text += page.extract_text()
         return text.strip()
     except Exception as e:
         st.error(f"Error during text extraction: {e}")
@@ -22,26 +21,21 @@ def extract_text_from_pdf(pdf_file):
 # Function to answer questions from the PDF text using a BERT-based question-answering model
 def answer_questions(pdf_text, question):
     try:
-        qa_pipeline = pipeline(
-            "question-answering",
-            model="deepset/bert-large-uncased-whole-word-masking-squad2",  # Updated model for better accuracy
-            tokenizer="deepset/bert-large-uncased-whole-word-masking-squad2",
-        )
-        response = qa_pipeline(question=question, context=pdf_text)
-        return response.get("answer", "").strip()
+        tokenizer = AutoTokenizer.from_pretrained("bert-large-uncased-whole-word-masking-finetuned-squad")
+        model = AutoModelForQuestionAnswering.from_pretrained("bert-large-uncased-whole-word-masking-finetuned-squad")
+        qa_pipeline = pipeline("question-answering", model=model, tokenizer=tokenizer)
+        answer = qa_pipeline(question=question, context=pdf_text)["answer"]
+        return answer.strip()
     except Exception as e:
         st.error(f"Error while answering questions: {e}")
         return ""
 
 # Streamlit app
-st.sidebar.title("Q & A App 💬")
-st.sidebar.markdown(
-    """
+st.sidebar.title(' Q & A App 💬')
+st.sidebar.markdown('''
     ## About
-    This app is an LLM-powered chatbot built using Streamlit and Hugging Face Transformers.  
-    Upload a PDF and ask questions to get answers based on the document content.
-    """
-)
+    This app is an LLM-powered chatbot built using STREAMLIT, HUGGING FACE TRANSFORMERS, BERT  
+''')
 
 st.title("PDF Q & A Chatbot 🤖")
 
@@ -53,7 +47,7 @@ if uploaded_file is not None:
     pdf_text = extract_text_from_pdf(uploaded_file)
     if pdf_text:
         st.write("**Extracted Content:**")
-        st.write(pdf_text[:5000])  # Limit displayed text to first 5000 characters for performance
+        st.write(pdf_text)
 
         st.write("---")
 
